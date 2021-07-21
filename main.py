@@ -1,11 +1,9 @@
 import requests
 import json
 import pandas as pd
-from fastapi import FastAPI
+from openpyxl import Workbook
 import os
 
-
-app = FastAPI()
 
 asset_contract_address = "0x3fe1a4c1481c8351e91b64d5c398b159de07cbc5"
 token_id = 5477
@@ -13,12 +11,63 @@ fetchSingleAsset = 'https://api.opensea.io/api/v1/asset/{}/{}'.format(asset_cont
 
 response = requests.request("GET", fetchSingleAsset)
 asset = json.loads(response.text)
-print(asset)
+# myDict = {}
+# for sections in asset:
+#     myDict[sections] = asset[sections]
+# print(myDict)
 
 
-@app.get("/")
-def read_root():
-    return asset
+wb = Workbook()
+defaultSheet = wb.active
+defaultSheet.title = "assetData"
+ws1 = wb.create_sheet("Mysheet") # insert at the end (default)
+ws2 = wb.create_sheet("Mysheets") # insert at the end (default)
+
+
+
+defaultSheet["A1"] = "hello"
+defaultSheet["B1"] = "world!"
+
+wb.save(filename="hello_world.xlsx")
+
+#asset_contract
+#collection
+    #payment_tokens
+        #indexes with data
+    #primary_asset_contracts
+        #indexes with data
+    #stats
+    #display_data
+#owner
+    #user
+#creator
+    #user
+#traits
+    #indexes with data
+#last_sale
+    #asset
+    #payment_token
+    #transaction
+        #from_account
+            #user
+        #to_account
+            #user
+#orders
+    #index
+        #metadata
+            #asset
+        #maker
+            #user
+        #taker
+            #user
+        #fee_recipient
+            #user
+        #payment_token_contract
+#top_ownerships
+    #index  
+        #owner
+            #user
+
 
 # filename = 'output.xlsx'
 # asset_file = 'assets.xlsx'
