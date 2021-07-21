@@ -1,0 +1,2 @@
+rebuild the virtual environment using:
+pip install -r requirements.txt
