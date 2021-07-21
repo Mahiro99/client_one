@@ -57,9 +57,13 @@ print("Blockchain: " + blockchain)
 
 
 
-# Convert(traits)
+temp = { 'Project Name' : project_name, 'Token ID': token_id, 
+'Contract Address':contract_address,'Last Sale Price':last_sale_price, 
+'Current Price':current_price, 'Highest Offer':highest_offer, 'Blockchain': blockchain } 
 
-df = pd.DataFrame.from_dict(final_dictionary, orient='index')
+print(temp)
+
+df = pd.DataFrame.from_dict(temp, orient='index')
 df = df.transpose()
 df.to_excel(filename)
 
