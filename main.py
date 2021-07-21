@@ -11,3 +11,4 @@ print(final_dictionary['traits'])
 df = pd.DataFrame.from_dict(final_dictionary, orient='index')
 df = df.transpose()
 df.to_excel('file1.xlsx')
+
