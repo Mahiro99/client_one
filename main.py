@@ -91,10 +91,18 @@ files = os.listdir(cwd)
 
 
 df2 = pd.DataFrame()
-for file in files:
-     if file.endswith('.xlsx'):
-         df2 = df2.append(pd.read_excel(file), ignore_index=True) 
+# for file in files:
+#      if file.endswith('.xlsx'):
+#          df2 = df2.append(pd.read_excel(file), ignore_index=True) 
 
-df2.head()
+# df2.head()
 
-df2.to_excel(filename)
+df_1 = pd.DataFrame(asset)
+df_2 = pd.DataFrame(traits)
+
+writer = pd.ExcelWriter('newOut.xlsx')
+
+df_1.to_excel(writer, sheet_name = 'Assets', index = False)
+df_2.to_excel(writer, sheet_name = 'Traits', index = False)
+
+writer.save()
