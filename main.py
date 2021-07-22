@@ -63,6 +63,13 @@ asset.to_excel(asset_file)
 collection = pd.json_normalize(final_dictionary['collection'])
 collection.to_excel(collection_file)
 
+c_payment_token = pd.json_normalize(final_dictionary['collection']['payment_tokens'])
+c_payment_token.to_excel('c_payment_token.xlsx')
+
+c_primary_assets = pd.json_normalize(final_dictionary['collection']['primary_asset_contracts'])
+c_primary_assets.to_excel('c_primary_assets.xlsx')
+
+
 owner = pd.json_normalize(final_dictionary['owner'])
 owner.to_excel(owner_file)
 
