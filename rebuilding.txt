@@ -1,4 +1,0 @@
-rebuild the virtual environment using:
-    pip install -r requirements.txt
-add to requirements using:
-    pip3 freeze > requirements.txt 
