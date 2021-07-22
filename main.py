@@ -5,8 +5,8 @@ from openpyxl import Workbook
 import os
 
 
-asset_contract_address = "0x3fe1a4c1481c8351e91b64d5c398b159de07cbc5"
-token_id = 5477
+asset_contract_address = "0xb47e3cd837ddf8e4c57f05d70ab865de6e193bbb"
+token_id = 1
 fetchSingleAsset = 'https://api.opensea.io/api/v1/asset/{}/{}'.format(
     asset_contract_address, token_id)
 
@@ -17,7 +17,8 @@ wb = Workbook()
 defaultSheet = wb.active
 defaultSheet.title = "assetData"
 
-mylist = ['asset_contract', 'collection', 'traits', 'owner', 'creator', 'orders', 'top_ownerships', 'last_sale']
+mylist = ['asset_contract', 'collection', 'traits', 'owner',
+          'creator', 'orders', 'top_ownerships', 'last_sale']
 for sections in asset:
     if sections in mylist and isinstance(asset[sections], dict):
         sec = wb.create_sheet(sections)
@@ -35,17 +36,17 @@ for sections in asset:
                     if isinstance(v, dict):
                         for m, n in v.items():
                             if isinstance(n, dict):
-                                for a,b in n.items():
-                                    print(a, '-->', b, "21")
+                                for a, b in n.items():
+                                    print(a, '-->', b, "2")
                                     innerSec.append([a, b])
                             else:
-                                print(m, '-->', n, "21")
+                                print(m, '-->', n, "3")
                                 innerSec.append([m, n])
                     else:
-                        print(k, '-->', v, "22")
+                        print(k, '-->', v, "4")
                         innerSec.append([k, v])
             else:
-                print(key, '-->', value)
+                print(key, '-->', value, 5)
                 sec.append([key, str(value)])
 
     # for indexed data, might wanna save it excel in a diff format instead of key value
@@ -53,29 +54,24 @@ for sections in asset:
         sec = wb.create_sheet(sections)
         for item in asset[sections]:
             for k, v in item.items():
-                print(k, '-->', v, "3")
+                print(k, '-->', v, "6")
                 if isinstance(v, dict):
-                    innerSec = wb.create_sheet(sections+ '_' + k)
+                    innerSec = wb.create_sheet(sections + '_' + k)
                     for x, y in v.items():
-                        print(x, '-->', y, "WOOO", type(y))
+                        print(x, '-->', y, "WOOO", "7")
                         if isinstance(y, dict):
                             for m, n in y.items():
-                                print(m, '-->', n, "5")
+                                print(m, '-->', n, "8")
                                 innerSec.append([m, n])
                         else:
-                            print(x, '-->', y, "6")
+                            print(x, '-->', y, "9")
                             innerSec.append([x, y])
-                else:                
-                    print(k, '-->', v, "4")
+                else:
+                    print(k, '-->', v, "10")
                     sec.append([k, v])
     else:
-        print(type(asset[sections]))
-        print(sections, '-->', asset[sections], "4")
+        print(sections, '-->', asset[sections], "11")
         defaultSheet.append([sections, str(asset[sections])])
 
 
 wb.save(filename="AssetObject.xlsx")
-# [smth, smth, smth, smth, smth, smth
-#     1, 2, 3, 4, 5, 6,
-#     2, 3,4,5,6,7,8,
-# ]
