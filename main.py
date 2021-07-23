@@ -99,10 +99,17 @@ df2 = pd.DataFrame()
 
 df_1 = pd.DataFrame(asset)
 df_2 = pd.DataFrame(traits)
+df_3 = pd.DataFrame(collection)
+df_4 = pd.DataFrame(c_primary_assets)
+df_5 = pd.DataFrame(c_payment_token)
 
 writer = pd.ExcelWriter('newOut.xlsx')
 
 df_1.to_excel(writer, sheet_name = 'Assets', index = False)
 df_2.to_excel(writer, sheet_name = 'Traits', index = False)
+df_3.to_excel(writer, sheet_name = 'Collections', index = False)
+df_4.to_excel(writer, sheet_name = 'Collection Primary Assets', index = False)
+df_5.to_excel(writer, sheet_name = 'Collection Payment Tokens', index = False)
+
 
 writer.save()
