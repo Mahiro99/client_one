@@ -23,9 +23,7 @@ generalInfo = {'Name': final_dictionary['collection']['primary_asset_contracts']
 'Created Date': final_dictionary['collection']['primary_asset_contracts'][0]['created_date'], 'Schema Name': final_dictionary['collection']['primary_asset_contracts'][0]['schema_name'],
 'Symbol': final_dictionary['collection']['primary_asset_contracts'][0]['symbol'], 'Payout Address': final_dictionary['collection']['primary_asset_contracts'][0]['payout_address'],
 'Creator User': final_dictionary['creator']['user']['username'], 'NFT Name':final_dictionary['asset_contract']['name'], 'Token ID':final_dictionary['token_id'],
-'Owner': final_dictionary['owner']['user']['username'], 'Permalink': final_dictionary['permalink']}
-
-otherInfo = {'Event Type ':final_dictionary['last_sale']['event_type'], 'Event Timestamp': final_dictionary['last_sale']['event_timestamp'],
+'Owner': final_dictionary['owner']['user']['username'], 'Permalink': final_dictionary['permalink'],'Event Type ':final_dictionary['last_sale']['event_type'], 'Event Timestamp': final_dictionary['last_sale']['event_timestamp'],
 'Auction Type': final_dictionary['last_sale']['auction_type'], 'Total Price': final_dictionary['last_sale']['total_price'],
 'Last Sale Creation Date': final_dictionary['last_sale']['created_date'], 'Quantity': final_dictionary['last_sale']['quantity'],
 'Telegram URL':final_dictionary['collection']['telegram_url'], 'Twitter User': final_dictionary['collection']['twitter_username'],
@@ -39,13 +37,11 @@ traits = pd.json_normalize(final_dictionary['traits'])
 
 df_1 = pd.DataFrame(generalInfo, index=[0])
 df_2 = pd.DataFrame(traits)
-df_3 = pd.DataFrame(otherInfo, index=[0])
 
 writer = pd.ExcelWriter('Final.xlsx')
 
 df_1.to_excel(writer, sheet_name = 'General Info', index=True)
 df_2.to_excel(writer, sheet_name = 'Traits', index = False)
-df_3.to_excel(writer, sheet_name = 'Other Info', index = False)
 
 
 writer.save()
