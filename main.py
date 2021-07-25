@@ -59,6 +59,9 @@ def calculateETHprice(final_dictionary):
     eth_price_calc = 1000000000000000000
     if len(final_dictionary['orders']) == 0:
         final_dictionary['orders'] = "None"
+    
+    if len(final_dictionary['owner']) == 0:
+        final_dictionary['owner'] = "None"
     else:
         last_current_price = len(final_dictionary['orders']) - 1
         for key,value in final_dictionary['orders'][last_current_price].items():
@@ -83,12 +86,29 @@ def getTheMainStuff():
             if key == 'last_sale' and value is None:
                 makeBool = False
                 break
+        
+        for key, value in final_dictionary['owner'].items():
+            if key == 'user' and value is None:
+                final_dictionary['owner']['user'] = 'None'
+                makeBool = False
 
+            # print(type(final_dictionary['owner']['user']))
+
+        if type(final_dictionary['owner']['user']) == dict:
+            if final_dictionary['owner']['user']['username'] is None:
+                final_dictionary['owner']['user'] = 'None'
+                makeBool = False
+           
 
         current_price = calculateETHprice(final_dictionary)
         print(current_price, "lol")
 
+        owner_user = final_dictionary['owner']['user']
+
+
+
         if makeBool:
+            print('hello')
             generalInfo = {
                 'Collection Name': final_dictionary['collection']['primary_asset_contracts'][0]['name'],
                 'Project Contract Address': final_dictionary['collection']['primary_asset_contracts'][0]['address'],
@@ -108,7 +128,11 @@ def getTheMainStuff():
                 'Instagram User': final_dictionary['collection']['instagram_username'],
                 'Discord URL': final_dictionary['collection']['discord_url'],
                 # ETH Price
-                'Current Price': current_price
+                'Current Price': current_price,
+                'Total NFTs in Collection': final_dictionary['collection']['stats']['total_supply'],
+                'Owner': owner_user['username'],
+                'Permalink': final_dictionary['permalink']
+
             }
         else:
             generalInfo = {
@@ -130,12 +154,18 @@ def getTheMainStuff():
                 'Instagram User': final_dictionary['collection']['instagram_username'],
                 'Discord URL': final_dictionary['collection']['discord_url'],
                 'Current Price': current_price,  # ETH Price
+                'Total NFTs in Collection': final_dictionary['collection']['stats']['total_supply'],
+                'Owner': final_dictionary['owner']['user'],
+                'Permalink': final_dictionary['permalink']
+
             }
 
+
         mytraits = getTokenStuff(final_dictionary)
-        for type, valAndCountList in mytraits.items():
-            generalInfo['Traits: ' + type] = valAndCountList[0][0]
-            generalInfo['Traits: ' + type + ' (#) '] = valAndCountList[0][1]
+        for trait_type, valAndCountList in mytraits.items():
+            generalInfo['Traits: ' + trait_type] = valAndCountList[0][0]
+            generalInfo['Traits: ' + trait_type + ' (#) '] = valAndCountList[0][1]
+            generalInfo['Traits ' + trait_type + ' %']  = valAndCountList[0][1] / final_dictionary['collection']['stats']['total_supply']
 
         output = output.append(generalInfo, ignore_index=True)
     return output
