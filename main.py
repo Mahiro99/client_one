@@ -24,6 +24,31 @@ def getTokenStuff(final_dictionary):
     return normalizedTraits
 
 
+def getSummaryStuff(token):
+    output = pd.DataFrame()
+    fetchSingleAsset = 'https://api.opensea.io/api/v1/asset/{}/{}'.format(
+        asset_contract_address, token)
+    response = requests.request("GET", fetchSingleAsset)
+    final_dictionary = json.loads(response.text)
+
+    name = final_dictionary['asset_contract']['name']
+    total_supply = final_dictionary['collection']['stats']['total_supply']
+    total_owners = final_dictionary['collection']['stats']['num_owners']
+    floor_price = final_dictionary['collection']['stats']['floor_price']
+    total_volume_traded = final_dictionary['collection']['stats']['total_volume']
+    description = final_dictionary['asset_contract']['description']
+    summaryInfo = {
+        "Name": name,
+        "Total Items": total_supply,
+        "Total Owners": total_owners,
+        "Floor Price": floor_price,
+        "Total Volume Traded": total_volume_traded,
+        "Description": description,
+    }
+    output = output.append(summaryInfo, ignore_index=True)
+    return output
+
+
 def getTheMainStuff():
     output = pd.DataFrame()
     for token in token_idList:
@@ -43,31 +68,57 @@ def getTheMainStuff():
                 break
 
         if makeBool:
-            generalInfo = {'Name': final_dictionary['collection']['primary_asset_contracts'][0]['name'], 'Address': final_dictionary['collection']['primary_asset_contracts'][0]['address'],
-                           'Description': final_dictionary['collection']['primary_asset_contracts'][0]['description'], 'External Link ': final_dictionary['collection']['primary_asset_contracts'][0]['external_link'],
-                           'Created Date': final_dictionary['collection']['primary_asset_contracts'][0]['created_date'], 'Schema Name': final_dictionary['collection']['primary_asset_contracts'][0]['schema_name'],
-                           'Symbol': final_dictionary['collection']['primary_asset_contracts'][0]['symbol'], 'Payout Address': final_dictionary['collection']['primary_asset_contracts'][0]['payout_address'],
-                           'Creator User': final_dictionary['creator']['user']['username'], 'NFT Name': final_dictionary['asset_contract']['name'], 'Token ID': final_dictionary['token_id'],
-                           'Auction Type': final_dictionary['last_sale']['auction_type'], 'Total Price': final_dictionary['last_sale']['total_price'],
-                           'Last Sale Creation Date': final_dictionary['last_sale']['created_date'], 'Quantity': final_dictionary['last_sale']['quantity'],
-                           'Telegram URL': final_dictionary['collection']['telegram_url'], 'Twitter User': final_dictionary['collection']['twitter_username'],
-                           'Instagram User': final_dictionary['collection']['instagram_username'], 'Wiki URL': final_dictionary['collection']['wiki_url'],
-                           'Discord URL': final_dictionary['collection']['discord_url'], 'ETH Price': final_dictionary['last_sale']['payment_token']['eth_price'],
-                           'USD Price': final_dictionary['last_sale']['payment_token']['usd_price'], 'Address of Last Transaction': final_dictionary['last_sale']['transaction']['from_account']['address']
-                           }
+            generalInfo = {
+                'Name': final_dictionary['collection']['primary_asset_contracts'][0]['name'],
+                'Address': final_dictionary['collection']['primary_asset_contracts'][0]['address'],
+                'Description': final_dictionary['collection']['primary_asset_contracts'][0]['description'],
+                'External Link ': final_dictionary['collection']['primary_asset_contracts'][0]['external_link'],
+                'Created Date': final_dictionary['collection']['primary_asset_contracts'][0]['created_date'],
+                'Schema Name': final_dictionary['collection']['primary_asset_contracts'][0]['schema_name'],
+                'Symbol': final_dictionary['collection']['primary_asset_contracts'][0]['symbol'],
+                'Payout Address': final_dictionary['collection']['primary_asset_contracts'][0]['payout_address'],
+                'Creator User': final_dictionary['creator']['user']['username'],
+                'NFT Name': final_dictionary['asset_contract']['name'],
+                'Token ID': final_dictionary['token_id'],
+                'Auction Type': final_dictionary['last_sale']['auction_type'],
+                'Total Price': final_dictionary['last_sale']['total_price'],
+                'Last Sale Creation Date': final_dictionary['last_sale']['created_date'],
+                'Quantity': final_dictionary['last_sale']['quantity'],
+                'Telegram URL': final_dictionary['collection']['telegram_url'],
+                'Twitter User': final_dictionary['collection']['twitter_username'],
+                'Instagram User': final_dictionary['collection']['instagram_username'],
+                'Wiki URL': final_dictionary['collection']['wiki_url'],
+                'Discord URL': final_dictionary['collection']['discord_url'],
+                'ETH Price': final_dictionary['last_sale']['payment_token']['eth_price'],
+                'USD Price': final_dictionary['last_sale']['payment_token']['usd_price'],
+                'Address of Last Transaction': final_dictionary['last_sale']['transaction']['from_account']['address']
+            }
         else:
-            generalInfo = {'Name': final_dictionary['collection']['primary_asset_contracts'][0]['name'], 'Address': final_dictionary['collection']['primary_asset_contracts'][0]['address'],
-                           'Description': final_dictionary['collection']['primary_asset_contracts'][0]['description'], 'External Link ': final_dictionary['collection']['primary_asset_contracts'][0]['external_link'],
-                           'Created Date': final_dictionary['collection']['primary_asset_contracts'][0]['created_date'], 'Schema Name': final_dictionary['collection']['primary_asset_contracts'][0]['schema_name'],
-                           'Symbol': final_dictionary['collection']['primary_asset_contracts'][0]['symbol'], 'Payout Address': final_dictionary['collection']['primary_asset_contracts'][0]['payout_address'],
-                           'Creator User': final_dictionary['creator']['user']['username'], 'NFT Name': final_dictionary['asset_contract']['name'], 'Token ID': final_dictionary['token_id'],
-                           'Auction Type': final_dictionary['last_sale'], 'Total Price': final_dictionary['last_sale'],
-                           'Last Sale Creation Date': final_dictionary['last_sale'], 'Quantity': final_dictionary['last_sale'],
-                           'Telegram URL': final_dictionary['collection']['telegram_url'], 'Twitter User': final_dictionary['collection']['twitter_username'],
-                           'Instagram User': final_dictionary['collection']['instagram_username'], 'Wiki URL': final_dictionary['collection']['wiki_url'],
-                           'Discord URL': final_dictionary['collection']['discord_url'], 'ETH Price': final_dictionary['last_sale'],
-                           'USD Price': final_dictionary['last_sale'], 'Address of Last Transaction': final_dictionary['last_sale']
-                           }
+            generalInfo = {
+                'Name': final_dictionary['collection']['primary_asset_contracts'][0]['name'],
+                'Address': final_dictionary['collection']['primary_asset_contracts'][0]['address'],
+                'Description': final_dictionary['collection']['primary_asset_contracts'][0]['description'],
+                'External Link ': final_dictionary['collection']['primary_asset_contracts'][0]['external_link'],
+                'Created Date': final_dictionary['collection']['primary_asset_contracts'][0]['created_date'],
+                'Schema Name': final_dictionary['collection']['primary_asset_contracts'][0]['schema_name'],
+                'Symbol': final_dictionary['collection']['primary_asset_contracts'][0]['symbol'],
+                'Payout Address': final_dictionary['collection']['primary_asset_contracts'][0]['payout_address'],
+                'Creator User': final_dictionary['creator']['user']['username'],
+                'NFT Name': final_dictionary['asset_contract']['name'],
+                'Token ID': final_dictionary['token_id'],
+                'Auction Type': final_dictionary['last_sale'],
+                'Total Price': final_dictionary['last_sale'],
+                'Last Sale Creation Date': final_dictionary['last_sale'],
+                'Quantity': final_dictionary['last_sale'],
+                'Telegram URL': final_dictionary['collection']['telegram_url'],
+                'Twitter User': final_dictionary['collection']['twitter_username'],
+                'Instagram User': final_dictionary['collection']['instagram_username'],
+                'Wiki URL': final_dictionary['collection']['wiki_url'],
+                'Discord URL': final_dictionary['collection']['discord_url'],
+                'ETH Price': final_dictionary['last_sale'],
+                'USD Price': final_dictionary['last_sale'],
+                'Address of Last Transaction': final_dictionary['last_sale']
+            }
 
         mytraits = getTokenStuff(final_dictionary)
         for type, valAndCountList in mytraits.items():
@@ -81,7 +132,10 @@ def getTheMainStuff():
 
 writer = pd.ExcelWriter('Final.xlsx')
 df = getTheMainStuff()
+summaryDf = getSummaryStuff(5477)
 df.to_excel(writer, sheet_name='General Info', index=True)
+summaryDf.to_excel(writer, sheet_name='Summary', index=True)
+
 writer.save()
 
 
