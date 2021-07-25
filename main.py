@@ -7,57 +7,21 @@ import time
 
 
 asset_contract_address = "0x3fe1a4c1481c8351e91b64d5c398b159de07cbc5"
-token_idList = [7656,
-                7117,
-                2696,
-                6209,
-                6903,
-                7085,
-                9341,
-                1591,
-                9752,
-                8699,
-                5755,
-                3828,
-                8986,
-                5344,
-                5682,
-                9755,
-                4823,
-                1735,
-                5868,
-                4815,
-                5637,
-                5860,
-                9641,
-                822,
-                8495,
-                695,
-                4876,
-                5956,
-                8925,
-                6286,
-                6432,
-                4416,
-                1660,
-                7583,
-                565,
-                9106,
-                3523,
-                8260,
-                3032,
-                2518,
-                9762,
-                36,
-                3579,
-                395,
-                3379,
-                9668,
-                8217,
-                1340,
-                1314,
-                1502,
-                7412]
+token_idList = [5477]
+
+
+def getTokenStuff(final_dictionary):
+    traits = final_dictionary['traits']
+    myTraits = {}
+    mylist = []
+    for type in traits:
+        for key, value in type.items():
+            if key == 'trait_type':
+                mylist = [val for val in type.values() if val !=
+                          value and val != None]
+                myTraits[value] = mylist
+    normalizedTraits = pd.json_normalize(myTraits)
+    return normalizedTraits
 
 
 def getTheMainStuff():
@@ -78,43 +42,7 @@ def getTheMainStuff():
                 makeBool = False
                 break
 
-        # print(final_dictionary.keys(), "testing request time out for throttle")
-        traits = pd.json_normalize(final_dictionary['traits'])
-        Hat_value = ''
-        Hat_trait_count = ''
-        Background_value = ''
-        Background_trait_count = ''
-        Skin_value = ''
-        Skin_trait_count = ''
-        Clothes_value = ''
-        Clothes_trait_count = ''
-        Eyes_value = ''
-        Eyes_trait_count = ''
-        Mouth_value = ''
-        Mouth_trait_count = ''
-
-        for index, row in traits.iterrows():
-            if row['trait_type'] == 'Hat':
-                Hat_value = row['value']
-                Hat_trait_count = row['trait_count']
-            elif row['trait_type'] == 'Background':
-                Background_value = row['value']
-                Background_trait_count = row['trait_count']
-            elif row['trait_type'] == 'Skin':
-                Skin_value = row['value']
-                Skin_trait_count = row['trait_count']
-            elif row['trait_type'] == 'Clothes':
-                Clothes_value = row['value']
-                Clothes_trait_count = row['trait_count']
-            elif row['trait_type'] == 'Eyes':
-                Eyes_value = row['value']
-                Eyes_trait_count = row['trait_count']
-            elif row['trait_type'] == 'Mouth':
-                Mouth_value = row['value']
-                Mouth_trait_count = row['trait_count']
-
         if makeBool:
-            # but i dont think usually youre supposed to hardcore values like that
             generalInfo = {'Name': final_dictionary['collection']['primary_asset_contracts'][0]['name'], 'Address': final_dictionary['collection']['primary_asset_contracts'][0]['address'],
                            'Description': final_dictionary['collection']['primary_asset_contracts'][0]['description'], 'External Link ': final_dictionary['collection']['primary_asset_contracts'][0]['external_link'],
                            'Created Date': final_dictionary['collection']['primary_asset_contracts'][0]['created_date'], 'Schema Name': final_dictionary['collection']['primary_asset_contracts'][0]['schema_name'],
@@ -125,13 +53,7 @@ def getTheMainStuff():
                            'Telegram URL': final_dictionary['collection']['telegram_url'], 'Twitter User': final_dictionary['collection']['twitter_username'],
                            'Instagram User': final_dictionary['collection']['instagram_username'], 'Wiki URL': final_dictionary['collection']['wiki_url'],
                            'Discord URL': final_dictionary['collection']['discord_url'], 'ETH Price': final_dictionary['last_sale']['payment_token']['eth_price'],
-                           'USD Price': final_dictionary['last_sale']['payment_token']['usd_price'], 'Address of Last Transaction': final_dictionary['last_sale']['transaction']['from_account']['address'],
-                           'Traits: Hat (#)': Hat_value + " ({}) ".format(Hat_trait_count),
-                           'Traits: Skin (#)': Skin_value + " ({}) ".format(Skin_trait_count),
-                           'Traits: Eyes (#)': Eyes_value + " ({}) ".format(Eyes_trait_count),
-                           'Traits: Mouth (#)': Mouth_value + " ({}) ".format(Mouth_trait_count),
-                           'Traits: Clothes (#)': Clothes_value + " ({}) ".format(Clothes_trait_count),
-                           'Traits: Background (#)': Background_value + " ({}) ".format(Background_trait_count),
+                           'USD Price': final_dictionary['last_sale']['payment_token']['usd_price'], 'Address of Last Transaction': final_dictionary['last_sale']['transaction']['from_account']['address']
                            }
         else:
             generalInfo = {'Name': final_dictionary['collection']['primary_asset_contracts'][0]['name'], 'Address': final_dictionary['collection']['primary_asset_contracts'][0]['address'],
@@ -144,14 +66,15 @@ def getTheMainStuff():
                            'Telegram URL': final_dictionary['collection']['telegram_url'], 'Twitter User': final_dictionary['collection']['twitter_username'],
                            'Instagram User': final_dictionary['collection']['instagram_username'], 'Wiki URL': final_dictionary['collection']['wiki_url'],
                            'Discord URL': final_dictionary['collection']['discord_url'], 'ETH Price': final_dictionary['last_sale'],
-                           'USD Price': final_dictionary['last_sale'], 'Address of Last Transaction': final_dictionary['last_sale'],
-                           'Traits: Hat (#)': Hat_value + " ({}) ".format(Hat_trait_count),
-                           'Traits: Skin (#)': Skin_value + " ({}) ".format(Skin_trait_count),
-                           'Traits: Eyes (#)': Eyes_value + " ({}) ".format(Eyes_trait_count),
-                           'Traits: Mouth (#)': Mouth_value + " ({}) ".format(Mouth_trait_count),
-                           'Traits: Clothes (#)': Clothes_value + " ({}) ".format(Clothes_trait_count),
-                           'Traits: Background (#)': Background_value + " ({}) ".format(Background_trait_count),
+                           'USD Price': final_dictionary['last_sale'], 'Address of Last Transaction': final_dictionary['last_sale']
                            }
+
+        mytraits = getTokenStuff(final_dictionary)
+        for type, valAndCountList in mytraits.items():
+            print(type, valAndCountList[0][0], valAndCountList[0][1], '\n')
+            generalInfo['Traits: ' + type] = valAndCountList[0][0]
+            generalInfo['Traits: ' + type + ' (#) '] = valAndCountList[0][1]
+
         output = output.append(generalInfo, ignore_index=True)
     return output
 
