@@ -6,6 +6,7 @@ import os
 import time
 
 
+eth_price_calc = 1000000000000000000
 asset_contract_address = "0x3fe1a4c1481c8351e91b64d5c398b159de07cbc5"
 token_idList = [7656,
                 7117,
@@ -77,6 +78,12 @@ def getTheMainStuff():
             if key == 'last_sale' and value is None:
                 makeBool = False
                 break
+        
+        anotherBool = True
+        for key,value in final_dictionary.items():
+            if key == 'orders' and value is None:
+                anotherBool = False
+                break
 
         # print(final_dictionary.keys(), "testing request time out for throttle")
         traits = pd.json_normalize(final_dictionary['traits'])
@@ -115,17 +122,17 @@ def getTheMainStuff():
 
         if makeBool:
             # but i dont think usually youre supposed to hardcore values like that
-            generalInfo = {'Name': final_dictionary['collection']['primary_asset_contracts'][0]['name'], 'Address': final_dictionary['collection']['primary_asset_contracts'][0]['address'],
-                           'Description': final_dictionary['collection']['primary_asset_contracts'][0]['description'], 'External Link ': final_dictionary['collection']['primary_asset_contracts'][0]['external_link'],
+            generalInfo = {'Collection Name': final_dictionary['collection']['primary_asset_contracts'][0]['name'], 'Address': final_dictionary['collection']['primary_asset_contracts'][0]['address'],
+                           'External Link ': final_dictionary['collection']['primary_asset_contracts'][0]['external_link'],
                            'Created Date': final_dictionary['collection']['primary_asset_contracts'][0]['created_date'], 'Schema Name': final_dictionary['collection']['primary_asset_contracts'][0]['schema_name'],
-                           'Symbol': final_dictionary['collection']['primary_asset_contracts'][0]['symbol'], 'Payout Address': final_dictionary['collection']['primary_asset_contracts'][0]['payout_address'],
-                           'Creator User': final_dictionary['creator']['user']['username'], 'NFT Name': final_dictionary['asset_contract']['name'], 'Token ID': final_dictionary['token_id'],
+                           'Symbol': final_dictionary['collection']['primary_asset_contracts'][0]['symbol'], 
+                           'Creator User': final_dictionary['creator']['user']['username'], 'NFT Name': final_dictionary['name'], 'Token ID': final_dictionary['token_id'],
                            'Auction Type': final_dictionary['last_sale']['auction_type'], 'Total Price': final_dictionary['last_sale']['total_price'],
                            'Last Sale Creation Date': final_dictionary['last_sale']['created_date'], 'Quantity': final_dictionary['last_sale']['quantity'],
                            'Telegram URL': final_dictionary['collection']['telegram_url'], 'Twitter User': final_dictionary['collection']['twitter_username'],
                            'Instagram User': final_dictionary['collection']['instagram_username'], 'Wiki URL': final_dictionary['collection']['wiki_url'],
-                           'Discord URL': final_dictionary['collection']['discord_url'], 'ETH Price': final_dictionary['last_sale']['payment_token']['eth_price'],
-                           'USD Price': final_dictionary['last_sale']['payment_token']['usd_price'], 'Address of Last Transaction': final_dictionary['last_sale']['transaction']['from_account']['address'],
+                           'Discord URL': final_dictionary['collection']['discord_url'], 'Current Price': float(final_dictionary['orders'][0]['current_price']) / eth_price_calc,
+                            'Address of Last Transaction': final_dictionary['last_sale']['transaction']['from_account']['address'],
                            'Traits: Hat (#)': Hat_value + " ({}) ".format(Hat_trait_count),
                            'Traits: Skin (#)': Skin_value + " ({}) ".format(Skin_trait_count),
                            'Traits: Eyes (#)': Eyes_value + " ({}) ".format(Eyes_trait_count),
@@ -133,18 +140,18 @@ def getTheMainStuff():
                            'Traits: Clothes (#)': Clothes_value + " ({}) ".format(Clothes_trait_count),
                            'Traits: Background (#)': Background_value + " ({}) ".format(Background_trait_count),
                            }
-        else:
-            generalInfo = {'Name': final_dictionary['collection']['primary_asset_contracts'][0]['name'], 'Address': final_dictionary['collection']['primary_asset_contracts'][0]['address'],
-                           'Description': final_dictionary['collection']['primary_asset_contracts'][0]['description'], 'External Link ': final_dictionary['collection']['primary_asset_contracts'][0]['external_link'],
+        elif makeBool == False or anotherBool == False:
+            generalInfo = {'Collection Name': final_dictionary['collection']['primary_asset_contracts'][0]['name'], 'Address': final_dictionary['collection']['primary_asset_contracts'][0]['address'],
+                            'External Link ': final_dictionary['collection']['primary_asset_contracts'][0]['external_link'],
                            'Created Date': final_dictionary['collection']['primary_asset_contracts'][0]['created_date'], 'Schema Name': final_dictionary['collection']['primary_asset_contracts'][0]['schema_name'],
-                           'Symbol': final_dictionary['collection']['primary_asset_contracts'][0]['symbol'], 'Payout Address': final_dictionary['collection']['primary_asset_contracts'][0]['payout_address'],
-                           'Creator User': final_dictionary['creator']['user']['username'], 'NFT Name': final_dictionary['asset_contract']['name'], 'Token ID': final_dictionary['token_id'],
+                           'Symbol': final_dictionary['collection']['primary_asset_contracts'][0]['symbol'], 
+                           'Creator User': final_dictionary['creator']['user']['username'], 'NFT Name': final_dictionary['name'], 'Token ID': final_dictionary['token_id'],
                            'Auction Type': final_dictionary['last_sale'], 'Total Price': final_dictionary['last_sale'],
                            'Last Sale Creation Date': final_dictionary['last_sale'], 'Quantity': final_dictionary['last_sale'],
                            'Telegram URL': final_dictionary['collection']['telegram_url'], 'Twitter User': final_dictionary['collection']['twitter_username'],
-                           'Instagram User': final_dictionary['collection']['instagram_username'], 'Wiki URL': final_dictionary['collection']['wiki_url'],
-                           'Discord URL': final_dictionary['collection']['discord_url'], 'ETH Price': final_dictionary['last_sale'],
-                           'USD Price': final_dictionary['last_sale'], 'Address of Last Transaction': final_dictionary['last_sale'],
+                           'Instagram User': final_dictionary['collection']['instagram_username'],
+                           'Discord URL': final_dictionary['collection']['discord_url'], 'Current Price': final_dictionary['orders'],
+                            'Address of Last Transaction': final_dictionary['last_sale'],
                            'Traits: Hat (#)': Hat_value + " ({}) ".format(Hat_trait_count),
                            'Traits: Skin (#)': Skin_value + " ({}) ".format(Skin_trait_count),
                            'Traits: Eyes (#)': Eyes_value + " ({}) ".format(Eyes_trait_count),
