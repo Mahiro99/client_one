@@ -94,21 +94,22 @@ def getTheMainStuff():
 
             # print(type(final_dictionary['owner']['user']))
 
+        ownerBool = False
         if type(final_dictionary['owner']['user']) == dict:
             if final_dictionary['owner']['user']['username'] is None:
                 final_dictionary['owner']['user'] = 'None'
-                makeBool = False
+        else:
+            ownerBool = True
            
 
         current_price = calculateETHprice(final_dictionary)
-        print(current_price, "lol")
 
         owner_user = final_dictionary['owner']['user']
 
 
 
         if makeBool:
-            print('hello')
+            print('1ST')
             generalInfo = {
                 'Collection Name': final_dictionary['collection']['primary_asset_contracts'][0]['name'],
                 'Project Contract Address': final_dictionary['collection']['primary_asset_contracts'][0]['address'],
@@ -134,7 +135,8 @@ def getTheMainStuff():
                 'Permalink': final_dictionary['permalink']
 
             }
-        else:
+        elif makeBool == False:
+            print('2ND')
             generalInfo = {
                 'Collection Name': final_dictionary['collection']['primary_asset_contracts'][0]['name'],
                 'Project Contract Address': final_dictionary['collection']['primary_asset_contracts'][0]['address'],
@@ -159,6 +161,30 @@ def getTheMainStuff():
                 'Permalink': final_dictionary['permalink']
 
             }
+        if ownerBool:
+            print('3RD')
+            generalInfo = {'Collection Name': final_dictionary['collection']['primary_asset_contracts'][0]['name'],
+                'Project Contract Address': final_dictionary['collection']['primary_asset_contracts'][0]['address'],
+                'External Link ': final_dictionary['collection']['primary_asset_contracts'][0]['external_link'],
+                'Created Date': final_dictionary['collection']['primary_asset_contracts'][0]['created_date'],
+                'Schema Name': final_dictionary['collection']['primary_asset_contracts'][0]['schema_name'],
+                'Symbol': final_dictionary['collection']['primary_asset_contracts'][0]['symbol'],
+                'Creator User': final_dictionary['creator']['user']['username'],
+                'NFT Name': final_dictionary['name'],
+                'Token ID': final_dictionary['token_id'],
+                'Auction Type': final_dictionary['last_sale']['auction_type'],
+                'Total Price': final_dictionary['last_sale']['total_price'],
+                'Last Sale Creation Date': final_dictionary['last_sale']['created_date'],
+                'Quantity': final_dictionary['last_sale']['quantity'],
+                'Telegram URL': final_dictionary['collection']['telegram_url'],
+                'Twitter User': final_dictionary['collection']['twitter_username'],
+                'Instagram User': final_dictionary['collection']['instagram_username'],
+                'Discord URL': final_dictionary['collection']['discord_url'],
+                # ETH Price
+                'Current Price': current_price,
+                'Total NFTs in Collection': final_dictionary['collection']['stats']['total_supply'],
+                'Owner': final_dictionary['owner']['user'],
+                'Permalink': final_dictionary['permalink']}
 
 
         mytraits = getTokenStuff(final_dictionary)
