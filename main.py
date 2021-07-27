@@ -5,106 +5,6 @@ from openpyxl import Workbook
 import os
 import time
 
-# 26
-#  31
-#  29
-#  75
-#  98
-#  39
-#  37
-#   3
-#  42
-#  48
-#  28
-#  87
-#   1
-#  58
-#  27
-#  18
-#  64
-#  97
-#  49
-#  96
-#  20
-#  94
-#  93
-#  61
-#  72
-#  88
-#  80
-#  16
-#  33
-#  86
-#  69
-#  67
-#  54
-#  59
-#  56
-# 100
-#  68
-#  10
-#  35
-#  53
-#  82
-#  83
-#  77
-#  47
-#  91
-#   6
-#  30
-#  36
-#  71
-#  17
-#  73
-#  12
-#   2
-#  55
-#  89
-#  44
-#  65
-#   5
-#  76
-#  62
-#  79
-#  66
-#  43
-#  14
-#  50
-#  74
-#  60
-#  51
-#   7
-#  11
-#  21
-#  34
-#  40
-#  32
-#  57
-#  15
-#  78
-#  24
-#  25
-#  38
-#  99
-#  13
-#  63
-#   9
-#  84
-#  23
-#  81
-#  92
-#   4
-#  46
-#  52
-#  41
-#  19
-#  85
-#  70
-#  45
-#  22
-#  95
-#   8
-#  90
 # asset_contract_address = "0x3fe1a4c1481c8351e91b64d5c398b159de07cbc5"
 
 def getTheMainStuff(asset_contract_address, tokens):
@@ -131,7 +31,9 @@ def getTheMainStuff(asset_contract_address, tokens):
         if final_dictionary['owner']['user'] == None:
             tempDict = {"username": "null"}
             final_dictionary['owner']['user'] = tempDict
-        
+        if final_dictionary['creator']['user'] == None:
+            tempDict = {"username": "null"}
+            final_dictionary['creator']['user'] = tempDict
         
         current_price = calculateETHprice(final_dictionary)
 
@@ -188,9 +90,14 @@ def getTheMainStuff(asset_contract_address, tokens):
 
         mytraits = getTokenStuff(final_dictionary)
         for trait_type, valAndCountList in mytraits.items():
-            generalInfo['Traits: ' + trait_type] = valAndCountList[0][0]
-            generalInfo['Traits: ' + trait_type + ' (#) '] = valAndCountList[0][1]
-            generalInfo['Traits: ' + trait_type + ' (%) ']  = (valAndCountList[0][1] / final_dictionary['collection']['stats']['total_supply']) * 100 
+            if len(valAndCountList[0]) == 3:
+                generalInfo['Traits: ' + trait_type] = valAndCountList[0][0]
+                generalInfo['Traits: ' + trait_type + ' (#) '] = valAndCountList[0][1]
+                generalInfo['Traits: ' + trait_type + ' (%) ']  = (valAndCountList[0][2] / final_dictionary['collection']['stats']['total_supply']) * 100 
+            else:
+                generalInfo['Traits: ' + trait_type] = valAndCountList[0][0]
+                generalInfo['Traits: ' + trait_type + ' (#) '] = valAndCountList[0][1]
+                generalInfo['Traits: ' + trait_type + ' (%) ']  = (valAndCountList[0][1] / final_dictionary['collection']['stats']['total_supply']) * 100 
 
         output = output.append(generalInfo, ignore_index=True)
         tokencount+=1
@@ -205,7 +112,7 @@ def getTokenStuff(final_dictionary):
         for key, value in type.items():
             if key == 'trait_type':
                 mylist = [val for val in type.values() if val !=
-                          value and val != None]
+                          value and val != None ]
                 myTraits[value] = mylist
     normalizedTraits = pd.json_normalize(myTraits)
     return normalizedTraits
@@ -268,9 +175,7 @@ def startScrape():
     summaryDf.to_excel(writer, sheet_name='Summary', index=True)
     writer.save()
 
-
-if __name__ == '__main__':
-    startScrape()
+startScrape()
 
 
 # def getAllDataFromAssetAndConverToExcelSheets():
