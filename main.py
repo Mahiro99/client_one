@@ -29,6 +29,11 @@ def getTheMainStuff(asset_contract_address, tokens):
         if final_dictionary['owner']['user'] == None:
             tempDict = {"username": "null"}
             final_dictionary['owner']['user'] = tempDict
+        
+        if final_dictionary['creator'] == None:
+            tempDict = {"user": {"username": "null"}}
+            final_dictionary['creator'] = tempDict
+            
         if final_dictionary['creator']['user'] == None:
             tempDict = {"username": "null"}
             final_dictionary['creator']['user'] = tempDict
