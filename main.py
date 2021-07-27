@@ -1,10 +1,13 @@
+#!/usr/bin/env python
+from typing import final
 import requests
 import json
 import pandas as pd
 from openpyxl import Workbook
 import os
 import time
-
+from urllib.request import urlopen as request
+from bs4 import BeautifulSoup as bs
 # asset_contract_address = "0x3fe1a4c1481c8351e91b64d5c398b159de07cbc5"
 
 def getTheMainStuff(asset_contract_address, tokens):
@@ -146,8 +149,13 @@ def getSummaryStuff(asset_contract_address, token):
 def calculateETHprice(final_dictionary):
     price = 0
     eth_price_calc = 1000000000000000000
-    if len(final_dictionary['orders']) == 0:
-        final_dictionary['orders'] = "None"
+    if len(final_dictionary['orders']) == 0 or len(final_dictionary['auctions']) != 0:
+        for item in final_dictionary['auctions']:
+            for key, value in item.items():
+                if key == 'current_price':
+                    price = float(value) / eth_price_calc
+        final_dictionary['orders'] = 'None'
+        
     else:
         last_current_price = len(final_dictionary['orders']) - 1
         for key,value in final_dictionary['orders'][last_current_price].items():
