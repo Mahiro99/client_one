@@ -7,7 +7,6 @@ from openpyxl import Workbook
 import os
 import time
 from urllib.request import urlopen as request
-from bs4 import BeautifulSoup as bs
 # asset_contract_address = "0x3fe1a4c1481c8351e91b64d5c398b159de07cbc5"
 
 def getTheMainStuff(asset_contract_address, tokens):
@@ -168,6 +167,7 @@ def startScrape():
     asset_contract_address = str(input("Enter Contract Address: "))
     # tokenSumm = int(input("Enter a token id for contract address summary: "))
     numElements = int(input("Enter number of elements: "))
+    print("Enter your token id's: ")
     tokenList = []
     for i in range(0, numElements):
         tokens = int(input())
