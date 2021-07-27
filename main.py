@@ -268,7 +268,9 @@ def startScrape():
     summaryDf.to_excel(writer, sheet_name='Summary', index=True)
     writer.save()
 
-startScrape()
+
+if __name__ == '__main__':
+    startScrape()
 
 
 # def getAllDataFromAssetAndConverToExcelSheets():
