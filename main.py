@@ -1,12 +1,8 @@
 #!/usr/bin/env python
-from typing import final
 import requests
 import json
 import pandas as pd
-from openpyxl import Workbook
-import os
 import time
-from urllib.request import urlopen as request
 # asset_contract_address = "0x3fe1a4c1481c8351e91b64d5c398b159de07cbc5"
 
 def getTheMainStuff(asset_contract_address, tokens):
