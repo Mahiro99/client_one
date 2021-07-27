@@ -5,14 +5,196 @@ from openpyxl import Workbook
 import os
 import time
 
+# 26
+#  31
+#  29
+#  75
+#  98
+#  39
+#  37
+#   3
+#  42
+#  48
+#  28
+#  87
+#   1
+#  58
+#  27
+#  18
+#  64
+#  97
+#  49
+#  96
+#  20
+#  94
+#  93
+#  61
+#  72
+#  88
+#  80
+#  16
+#  33
+#  86
+#  69
+#  67
+#  54
+#  59
+#  56
+# 100
+#  68
+#  10
+#  35
+#  53
+#  82
+#  83
+#  77
+#  47
+#  91
+#   6
+#  30
+#  36
+#  71
+#  17
+#  73
+#  12
+#   2
+#  55
+#  89
+#  44
+#  65
+#   5
+#  76
+#  62
+#  79
+#  66
+#  43
+#  14
+#  50
+#  74
+#  60
+#  51
+#   7
+#  11
+#  21
+#  34
+#  40
+#  32
+#  57
+#  15
+#  78
+#  24
+#  25
+#  38
+#  99
+#  13
+#  63
+#   9
+#  84
+#  23
+#  81
+#  92
+#   4
+#  46
+#  52
+#  41
+#  19
+#  85
+#  70
+#  45
+#  22
+#  95
+#   8
+#  90
+# asset_contract_address = "0x3fe1a4c1481c8351e91b64d5c398b159de07cbc5"
 
-asset_contract_address = "0x3fe1a4c1481c8351e91b64d5c398b159de07cbc5"
-token_idList = [
-    2560,
-  794,
- 8760,
- 8048
-]
+def getTheMainStuff(asset_contract_address, tokens):
+    output = pd.DataFrame()
+    tokencount= 0
+    for id in tokens:
+        if tokencount % 15 ==0:
+            time.sleep(0.6)
+        print(id)
+        fetchSingleAsset = 'https://api.opensea.io/api/v1/asset/{}/{}'.format(
+            asset_contract_address, id)
+
+        time.sleep(0.3)
+        response = requests.request("GET", fetchSingleAsset)
+        final_dictionary = json.loads(response.text)
+
+        # doing this in a hacky way right now,
+        makeBool = True
+        for key, value in final_dictionary.items():
+            if key == 'last_sale' and value is None:
+                makeBool = False
+                break
+        
+        if final_dictionary['owner']['user'] == None:
+            tempDict = {"username": "null"}
+            final_dictionary['owner']['user'] = tempDict
+        
+        
+        current_price = calculateETHprice(final_dictionary)
+
+        if makeBool:
+            generalInfo = {
+                'Collection Name': final_dictionary['collection']['primary_asset_contracts'][0]['name'],
+                'Project Contract Address': final_dictionary['collection']['primary_asset_contracts'][0]['address'],
+                'External Link ': final_dictionary['collection']['primary_asset_contracts'][0]['external_link'],
+                'Created Date': final_dictionary['collection']['primary_asset_contracts'][0]['created_date'],
+                'Schema Name': final_dictionary['collection']['primary_asset_contracts'][0]['schema_name'],
+                'Symbol': final_dictionary['collection']['primary_asset_contracts'][0]['symbol'],
+                'Creator User': final_dictionary['creator']['user']['username'],
+                'NFT Name': final_dictionary['name'],
+                'Token ID': final_dictionary['token_id'],
+                'Auction Type': final_dictionary['last_sale']['auction_type'],
+                'Total Price': final_dictionary['last_sale']['total_price'],
+                'Last Sale Creation Date': final_dictionary['last_sale']['created_date'],
+                'Quantity': final_dictionary['last_sale']['quantity'],
+                'Telegram URL': final_dictionary['collection']['telegram_url'],
+                'Twitter User': final_dictionary['collection']['twitter_username'],
+                'Instagram User': final_dictionary['collection']['instagram_username'],
+                'Discord URL': final_dictionary['collection']['discord_url'],
+                # ETH Price
+                'Current Price': current_price,
+                'Permalink': final_dictionary['permalink'],
+                'Total NFTs in Collection': final_dictionary['collection']['stats']['total_supply'],
+                'Owner': final_dictionary['owner']['user']['username'],
+            }
+        else:
+            generalInfo = {
+                'Collection Name': final_dictionary['collection']['primary_asset_contracts'][0]['name'],
+                'Project Contract Address': final_dictionary['collection']['primary_asset_contracts'][0]['address'],
+                'External Link ': final_dictionary['collection']['primary_asset_contracts'][0]['external_link'],
+                'Created Date': final_dictionary['collection']['primary_asset_contracts'][0]['created_date'],
+                'Schema Name': final_dictionary['collection']['primary_asset_contracts'][0]['schema_name'],
+                'Symbol': final_dictionary['collection']['primary_asset_contracts'][0]['symbol'],
+                'Creator User': final_dictionary['creator']['user']['username'],
+                'NFT Name': final_dictionary['name'],
+                'Token ID': final_dictionary['token_id'],
+                'Auction Type': final_dictionary['last_sale'],
+                'Total Price': final_dictionary['last_sale'],
+                'Last Sale Creation Date': final_dictionary['last_sale'],
+                'Quantity': final_dictionary['last_sale'],
+                'Telegram URL': final_dictionary['collection']['telegram_url'],
+                'Twitter User': final_dictionary['collection']['twitter_username'],
+                'Instagram User': final_dictionary['collection']['instagram_username'],
+                'Discord URL': final_dictionary['collection']['discord_url'],
+                'Current Price': current_price,  # ETH Price
+                'Permalink': final_dictionary['permalink'],
+                'Total NFTs in Collection': final_dictionary['collection']['stats']['total_supply'],
+                'Owner': final_dictionary['owner']['user']['username'],
+            }
+
+
+        mytraits = getTokenStuff(final_dictionary)
+        for trait_type, valAndCountList in mytraits.items():
+            generalInfo['Traits: ' + trait_type] = valAndCountList[0][0]
+            generalInfo['Traits: ' + trait_type + ' (#) '] = valAndCountList[0][1]
+            generalInfo['Traits: ' + trait_type + ' (%) ']  = (valAndCountList[0][1] / final_dictionary['collection']['stats']['total_supply']) * 100 
+
+        output = output.append(generalInfo, ignore_index=True)
+        tokencount+=1
+    return output
 
 
 def getTokenStuff(final_dictionary):
@@ -29,7 +211,7 @@ def getTokenStuff(final_dictionary):
     return normalizedTraits
 
 
-def getSummaryStuff(token):
+def getSummaryStuff(asset_contract_address, token):
     output = pd.DataFrame()
     fetchSingleAsset = 'https://api.opensea.io/api/v1/asset/{}/{}'.format(
         asset_contract_address, token)
@@ -59,9 +241,6 @@ def calculateETHprice(final_dictionary):
     eth_price_calc = 1000000000000000000
     if len(final_dictionary['orders']) == 0:
         final_dictionary['orders'] = "None"
-    
-    if len(final_dictionary['owner']) == 0:
-        final_dictionary['owner'] = "None"
     else:
         last_current_price = len(final_dictionary['orders']) - 1
         for key,value in final_dictionary['orders'][last_current_price].items():
@@ -69,141 +248,27 @@ def calculateETHprice(final_dictionary):
                 price = float(value) / eth_price_calc
     return price
 
-def getTheMainStuff():
-    output = pd.DataFrame()
-    for token in token_idList:
-        print(token)
-        fetchSingleAsset = 'https://api.opensea.io/api/v1/asset/{}/{}'.format(
-            asset_contract_address, token)
 
-        time.sleep(1)
-        response = requests.request("GET", fetchSingleAsset)
-        final_dictionary = json.loads(response.text)
-
-        # doing this in a hacky way right now,
-        makeBool = True
-        for key, value in final_dictionary.items():
-            if key == 'last_sale' and value is None:
-                makeBool = False
-                break
+def startScrape():
+    asset_contract_address = str(input("Enter Contract Address: "))
+    # tokenSumm = int(input("Enter a token id for contract address summary: "))
+    numElements = int(input("Enter number of elements: "))
+    tokenList = []
+    for i in range(0, numElements):
+        tokens = int(input())
+        tokenList.append(tokens)
         
-        for key, value in final_dictionary['owner'].items():
-            if key == 'user' and value is None:
-                final_dictionary['owner']['user'] = 'None'
-                makeBool = False
 
-            # print(type(final_dictionary['owner']['user']))
+    writer = pd.ExcelWriter('Final.xlsx')
+    
+    df = getTheMainStuff(asset_contract_address, tokenList)
+    summaryDf = getSummaryStuff(asset_contract_address, 1)
 
-        ownerBool = False
-        if type(final_dictionary['owner']['user']) == dict:
-            if final_dictionary['owner']['user']['username'] is None:
-                final_dictionary['owner']['user'] = 'None'
-        else:
-            ownerBool = True
-           
+    df.to_excel(writer, sheet_name='General Info', index=True)
+    summaryDf.to_excel(writer, sheet_name='Summary', index=True)
+    writer.save()
 
-        current_price = calculateETHprice(final_dictionary)
-
-        owner_user = final_dictionary['owner']['user']
-
-
-
-        if makeBool:
-            print('1ST')
-            generalInfo = {
-                'Collection Name': final_dictionary['collection']['primary_asset_contracts'][0]['name'],
-                'Project Contract Address': final_dictionary['collection']['primary_asset_contracts'][0]['address'],
-                'External Link ': final_dictionary['collection']['primary_asset_contracts'][0]['external_link'],
-                'Created Date': final_dictionary['collection']['primary_asset_contracts'][0]['created_date'],
-                'Schema Name': final_dictionary['collection']['primary_asset_contracts'][0]['schema_name'],
-                'Symbol': final_dictionary['collection']['primary_asset_contracts'][0]['symbol'],
-                'Creator User': final_dictionary['creator']['user']['username'],
-                'NFT Name': final_dictionary['name'],
-                'Token ID': final_dictionary['token_id'],
-                'Auction Type': final_dictionary['last_sale']['auction_type'],
-                'Total Price': final_dictionary['last_sale']['total_price'],
-                'Last Sale Creation Date': final_dictionary['last_sale']['created_date'],
-                'Quantity': final_dictionary['last_sale']['quantity'],
-                'Telegram URL': final_dictionary['collection']['telegram_url'],
-                'Twitter User': final_dictionary['collection']['twitter_username'],
-                'Instagram User': final_dictionary['collection']['instagram_username'],
-                'Discord URL': final_dictionary['collection']['discord_url'],
-                # ETH Price
-                'Current Price': current_price,
-                'Total NFTs in Collection': final_dictionary['collection']['stats']['total_supply'],
-                'Owner': owner_user['username'],
-                'Permalink': final_dictionary['permalink']
-
-            }
-        elif makeBool == False:
-            print('2ND')
-            generalInfo = {
-                'Collection Name': final_dictionary['collection']['primary_asset_contracts'][0]['name'],
-                'Project Contract Address': final_dictionary['collection']['primary_asset_contracts'][0]['address'],
-                'External Link ': final_dictionary['collection']['primary_asset_contracts'][0]['external_link'],
-                'Created Date': final_dictionary['collection']['primary_asset_contracts'][0]['created_date'],
-                'Schema Name': final_dictionary['collection']['primary_asset_contracts'][0]['schema_name'],
-                'Symbol': final_dictionary['collection']['primary_asset_contracts'][0]['symbol'],
-                'Creator User': final_dictionary['creator']['user']['username'],
-                'NFT Name': final_dictionary['name'],
-                'Token ID': final_dictionary['token_id'],
-                'Auction Type': final_dictionary['last_sale'],
-                'Total Price': final_dictionary['last_sale'],
-                'Last Sale Creation Date': final_dictionary['last_sale'],
-                'Quantity': final_dictionary['last_sale'],
-                'Telegram URL': final_dictionary['collection']['telegram_url'],
-                'Twitter User': final_dictionary['collection']['twitter_username'],
-                'Instagram User': final_dictionary['collection']['instagram_username'],
-                'Discord URL': final_dictionary['collection']['discord_url'],
-                'Current Price': current_price,  # ETH Price
-                'Total NFTs in Collection': final_dictionary['collection']['stats']['total_supply'],
-                'Owner': final_dictionary['owner']['user'],
-                'Permalink': final_dictionary['permalink']
-
-            }
-        if ownerBool:
-            print('3RD')
-            generalInfo = {'Collection Name': final_dictionary['collection']['primary_asset_contracts'][0]['name'],
-                'Project Contract Address': final_dictionary['collection']['primary_asset_contracts'][0]['address'],
-                'External Link ': final_dictionary['collection']['primary_asset_contracts'][0]['external_link'],
-                'Created Date': final_dictionary['collection']['primary_asset_contracts'][0]['created_date'],
-                'Schema Name': final_dictionary['collection']['primary_asset_contracts'][0]['schema_name'],
-                'Symbol': final_dictionary['collection']['primary_asset_contracts'][0]['symbol'],
-                'Creator User': final_dictionary['creator']['user']['username'],
-                'NFT Name': final_dictionary['name'],
-                'Token ID': final_dictionary['token_id'],
-                'Auction Type': final_dictionary['last_sale']['auction_type'],
-                'Total Price': final_dictionary['last_sale']['total_price'],
-                'Last Sale Creation Date': final_dictionary['last_sale']['created_date'],
-                'Quantity': final_dictionary['last_sale']['quantity'],
-                'Telegram URL': final_dictionary['collection']['telegram_url'],
-                'Twitter User': final_dictionary['collection']['twitter_username'],
-                'Instagram User': final_dictionary['collection']['instagram_username'],
-                'Discord URL': final_dictionary['collection']['discord_url'],
-                # ETH Price
-                'Current Price': current_price,
-                'Total NFTs in Collection': final_dictionary['collection']['stats']['total_supply'],
-                'Owner': final_dictionary['owner']['user'],
-                'Permalink': final_dictionary['permalink']}
-
-
-        mytraits = getTokenStuff(final_dictionary)
-        for trait_type, valAndCountList in mytraits.items():
-            generalInfo['Traits: ' + trait_type] = valAndCountList[0][0]
-            generalInfo['Traits: ' + trait_type + ' (#) '] = valAndCountList[0][1]
-            generalInfo['Traits ' + trait_type + ' %']  = valAndCountList[0][1] / final_dictionary['collection']['stats']['total_supply']
-
-        output = output.append(generalInfo, ignore_index=True)
-    return output
-
-
-writer = pd.ExcelWriter('Final.xlsx')
-df = getTheMainStuff()
-summaryDf = getSummaryStuff(5477)
-df.to_excel(writer, sheet_name='General Info', index=True)
-summaryDf.to_excel(writer, sheet_name='Summary', index=True)
-
-writer.save()
+startScrape()
 
 
 # def getAllDataFromAssetAndConverToExcelSheets():
