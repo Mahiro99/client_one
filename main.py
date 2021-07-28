@@ -3,19 +3,18 @@ import requests
 import json
 import pandas as pd
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 # asset_contract_address = "0x3fe1a4c1481c8351e91b64d5c398b159de07cbc5"
 
 def getTheMainStuff(asset_contract_address, tokens):
     output = pd.DataFrame()
     tokencount= 0
     for id in tokens:
-        if tokencount % 15 ==0:
-            time.sleep(0.6)
         print(id)
         fetchSingleAsset = 'https://api.opensea.io/api/v1/asset/{}/{}'.format(
             asset_contract_address, id)
-
-        time.sleep(0.3)
+        
+        time.sleep(0.4)
         response = requests.request("GET", fetchSingleAsset)
         final_dictionary = json.loads(response.text)
 
@@ -166,18 +165,14 @@ def calculateETHprice(final_dictionary):
 
 def startScrape():
     asset_contract_address = str(input("Enter Contract Address: "))
-    # tokenSumm = int(input("Enter a token id for contract address summary: "))
-    numElements = int(input("Enter number of elements: "))
-    print("Enter your token id's: ")
-    tokenList = []
-    for i in range(0, numElements):
-        tokens = int(input())
-        tokenList.append(tokens)
-        
+    tokenList = [int(x) for x in input("Enter your range of tokens, separated by a space: ").split(' ')]
+    listy = []
+    for x in range(tokenList[0], tokenList[1]):
+        listy.append(x)
 
     writer = pd.ExcelWriter('Final.xlsx')
     
-    df = getTheMainStuff(asset_contract_address, tokenList)
+    df = getTheMainStuff(asset_contract_address, listy)
     summaryDf = getSummaryStuff(asset_contract_address, 1)
 
     df.to_excel(writer, sheet_name='General Info', index=True)
