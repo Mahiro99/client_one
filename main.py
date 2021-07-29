@@ -7,6 +7,7 @@ import time
 
 def getTheMainStuff(asset_contract_address, tokenList, timeInterval):
     output = pd.DataFrame()
+    myTraits = {}
     for id in tokenList:
         for x in range(id[0], id[1]):
             print('-->', x, 'Completed')
@@ -100,9 +101,31 @@ def getTheMainStuff(asset_contract_address, tokenList, timeInterval):
                     generalInfo['Traits: ' + trait_type + ' (%) ']  = (valAndCountList[0][1] / final_dictionary['collection']['stats']['total_supply']) * 100 
 
             output = output.append(generalInfo, ignore_index=True)
-    getScore(output)
+        output = getScore(output)
     return output
 
+def getScore(output):
+    df2 = output.filter(regex='#')
+    rs=[]
+    scoreList= []
+    list1 = []
+    sums= []
+    for index, row in df2.iterrows():
+        for key, value in df2.items():
+            x = float(df2[key].iloc[index])
+            list1.append(x)
+            max = float(df2[key].max())
+            min = float(df2[key].min())
+        print(list1, "ALL VALUES FOR A SINGLE NFT")
+        for x in list1:
+            scores = 1 + (x - min)*4/(max-min)
+            scoreList.append(scores)
+        sums.append(sum(scoreList))
+        list1.clear()
+        scoreList.clear()
+  
+    output['Rarity Sniper Score'] = sums
+    return output
 
 def getTokenStuff(final_dictionary):
     traits = final_dictionary['traits']
@@ -165,17 +188,6 @@ def calculateETHprice(final_dictionary):
             if key == 'current_price':
                 price = float(value) / eth_price_calc
     return price
-
-def getScore(output):
-    print(output)
-    df2 = output.filter(regex='#')
-    myDict= {}
-    for key, value in df2.items():
-        print(key, value)
-        print(df2[key].max(), "MAX")
-        print(df2[key].max(), "MAX")
-
-    return 0
 
 def startScrape():
     asset_contract_address = str(input("Enter Contract Address: "))
