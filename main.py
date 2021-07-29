@@ -112,6 +112,7 @@ def getScore(output):
     sums= []
     for index, row in df2.iterrows():
         for key, value in df2.items():
+            print(value, "VALUE")
             if type(df2[key].iloc[index]) == str:
                 continue
             else:
@@ -121,11 +122,17 @@ def getScore(output):
             min = float(df2[key].min())
             maxMinList.append([max, min])
         list1 = [0 if pd.isna(x) else x for x in list1]
+        print(list1, "value list")
         for x in list1:
             if x!=0:
-                scores = 1 + (x - maxMinList[0][1])*4/(maxMinList[0][0]-maxMinList[0][1])
+                diff = maxMinList[0][0]-maxMinList[0][1]
+                if diff == 0:
+                    scores = 1
+                else:
+                    scores = 1 + (x - maxMinList[0][1])*4/(diff)
                 scoreList.append(scores)
                 del maxMinList[0]
+                print(x, '-->', maxMinList, "MaxMinList")
         sums.append(sum(scoreList))
         list1.clear()
         scoreList.clear()
