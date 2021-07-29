@@ -100,6 +100,7 @@ def getTheMainStuff(asset_contract_address, tokenList, timeInterval):
                     generalInfo['Traits: ' + trait_type + ' (%) ']  = (valAndCountList[0][1] / final_dictionary['collection']['stats']['total_supply']) * 100 
 
             output = output.append(generalInfo, ignore_index=True)
+    getScore(output)
     return output
 
 
@@ -165,17 +166,24 @@ def calculateETHprice(final_dictionary):
                 price = float(value) / eth_price_calc
     return price
 
-def getScore():
+def getScore(output):
+    print(output)
+    df2 = output.filter(regex='#')
+    myDict= {}
+    for key, value in df2.items():
+        print(key, value)
+        print(df2[key].max(), "MAX")
+        print(df2[key].max(), "MAX")
+
     return 0
 
 def startScrape():
     asset_contract_address = str(input("Enter Contract Address: "))
     numOfRanges = int(input("Choose number of ranges: "))
-    final_list = [[int(input("Enter number and press enter(Every 2 numbers will be a range): ")) for _ in range(2)] for _ in range(numOfRanges)]
+    final_list = [[int(input("Enter a number and press enter(Every 2 numbers will be a range): ")) for _ in range(2)] for _ in range(numOfRanges)]
     timeInterval = float(input("Interval between each token(ms). Standard is 0.4: "))
 
     writer = pd.ExcelWriter('Final.xlsx')
-    
 
     df = getTheMainStuff(asset_contract_address, final_list, timeInterval)
     summaryDf = getSummaryStuff(asset_contract_address, 1)
