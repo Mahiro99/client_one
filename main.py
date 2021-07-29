@@ -106,23 +106,30 @@ def getTheMainStuff(asset_contract_address, tokenList, timeInterval):
 
 def getScore(output):
     df2 = output.filter(regex='#')
-    rs=[]
-    scoreList= []
     list1 = []
+    scoreList= []
+    maxMinList = []
     sums= []
     for index, row in df2.iterrows():
         for key, value in df2.items():
-            x = float(df2[key].iloc[index])
-            list1.append(x)
+            if type(df2[key].iloc[index]) == str:
+                continue
+            else:
+                x = float(df2[key].iloc[index])
+                list1.append(x)
             max = float(df2[key].max())
             min = float(df2[key].min())
-        print(list1, "ALL VALUES FOR A SINGLE NFT")
+            maxMinList.append([max, min])
+        list1 = [0 if pd.isna(x) else x for x in list1]
         for x in list1:
-            scores = 1 + (x - min)*4/(max-min)
-            scoreList.append(scores)
+            if x!=0:
+                scores = 1 + (x - maxMinList[0][1])*4/(maxMinList[0][0]-maxMinList[0][1])
+                scoreList.append(scores)
+                del maxMinList[0]
         sums.append(sum(scoreList))
         list1.clear()
         scoreList.clear()
+        maxMinList.clear()
   
     output['Rarity Sniper Score'] = sums
     return output
@@ -203,6 +210,7 @@ def startScrape():
     df.to_excel(writer, sheet_name='General Info', index=True)
     summaryDf.to_excel(writer, sheet_name='Summary', index=True)
     writer.save()
+    input("Press enter to exit")
 
 startScrape()
 
