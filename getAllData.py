@@ -60,4 +60,4 @@ def getAllDataFromAssetAndConverToExcelSheets():
             defaultSheet.append([sections, str(asset[sections])])
     wb.save(filename="AssetObject.xlsx")
 
-# getAllDataFromAssetAndConverToExcelSheets()
+getAllDataFromAssetAndConverToExcelSheets()
